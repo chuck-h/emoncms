@@ -204,7 +204,13 @@ API.txt for details.
 					axis.tickGenerator = function(axis) {
 
 						var ticks = [];
-						var d = makeUtcWrapper(new Date(axis.min));
+
+                                                // need timezone offset in order to place ticks appropriately //
+                                                var dd = new Date(axis.min);
+                                                var nn = dd.getTimezoneOffset();
+                                                var offset_hr = nn / -60;
+
+						var d = makeUtcWrapper(dd);
 						var minSize = 0;
 
 						// make quarter use a possibility if quarters are
@@ -279,7 +285,7 @@ API.txt for details.
 						} else if (unit == "minute") {
 							d.setMinutes(floorInBase(d.getMinutes(), tickSize));
 						} else if (unit == "hour") {
-							d.setHours(floorInBase(d.getHours(), tickSize));
+							d.setHours(floorInBase(d.getHours()+offset_hr, tickSize)-offset_hr);
 						} else if (unit == "month") {
 							d.setMonth(floorInBase(d.getMonth(), tickSize));
 						} else if (unit == "quarter") {
@@ -300,7 +306,7 @@ API.txt for details.
 							d.setMinutes(0);
 						}
 						if (step >= timeUnitSize.day) {
-							d.setHours(0);
+							d.setHours(24-offset_hr);
 						}
 						if (step >= timeUnitSize.day * 4) {
 							d.setDate(1);
